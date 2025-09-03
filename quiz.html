@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Katzen-Quiz – Lecy, Lucas & Lizz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fdf6e3;
+            color: #333;
+            max-width: 750px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #d2691e;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #fff8dc;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .quiz-image {
+            max-width: 85%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 4px solid white;
+            background: white;
+            padding: 5px;
+            transition: transform 0.2s ease;
+        }
+        .quiz-image:hover {
+            transform: scale(1.02);
+        }
+        button {
+            background: #d2691e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        button:hover {
+            background: #a0522d;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0e68c;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+
+<h1>🐾 Katzen-Quiz: Beobachte die Fotos! 🐾</h1>
+
+<form id="quizForm">
+    <div class="question">
+        <p>1. Wie viele Katzen siehst du auf diesem Foto?</p>
+    <img src="fotos/Lizz und Lukas.jpg" alt="Zwei Katzen" class="quiz-image standard-img">
+        <label><input type="radio" name="q1" value="falsch"> Eine</label><br>
+        <label><input type="radio" name="q1" value="richtig"> Zwei</label><br>
+        <label><input type="radio" name="q1" value="falsch"> Drei</label>
+    </div>
+
+    <div class="question">
+        <p>2. Was machen die beiden Katzen auf dem Foto?</p>
+    <img src="fotos/Lizz und Lukas.jpg" alt="Katzen sitzen" class="quiz-image standard-img">
+        <label><input type="radio" name="q2" value="richtig"> Sie sitzen.</label><br>
+        <label><input type="radio" name="q2" value="falsch"> Sie schlafen.</label><br>
+        <label><input type="radio" name="q2" value="falsch"> Sie spielen.</label>
+    </div>
+
+    <div class="question">
+        <p>3. Was macht die Katze auf diesem Foto?</p>
+        <img src="fotos/Lukas schlafen.jpg" alt="Katze schläft" class="quiz-image standard-img">
+        <label><input type="radio" name="q3" value="richtig"> Sie schläft.</label><br>
+        <label><input type="radio" name="q3" value="falsch"> Sie frisst.</label><br>
+        <label><input type="radio" name="q3" value="falsch"> Sie springt.</label>
+    </div>
+
+    <div class="question">
+        <p>4. Welche Katze ist auf diesem Foto zu sehen?</p>
+        <img src="fotos/Lecy vorstellen.jpg" alt="Lecy" class="quiz-image standard-img">
+        <label><input type="radio" name="q4" value="richtig"> Lecy</label><br>
+        <label><input type="radio" name="q4" value="falsch"> Lizz</label><br>
+        <label><input type="radio" name="q4" value="falsch"> Lukas</label>
+    </div>
+
+    <div class="question">
+        <p>5. Was macht Lizz auf diesem Foto?</p>
+        <img src="fotos/Lizz schlafen.jpg" alt="Lizz schläft" class="quiz-image standard-img">
+        <label><input type="radio" name="q5" value="richtig"> Sie schläft.</label><br>
+        <label><input type="radio" name="q5" value="falsch"> Sie spielt.</label><br>
+        <label><input type="radio" name="q5" value="falsch"> Sie läuft.</label>
+    </div>
+
+    <button type="button" onclick="auswerten()">Quiz auswerten</button>
+</form>
+
+<div id="result" class="result" style="display:none;"></div>
+
+<style>
+.standard-img {
+    max-width: 320px;
+    max-height: 340px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 12px auto 8px auto;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+    border: 3px solid #fff;
+    background: #fff;
+    padding: 6px;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.correct-effect {
+    animation: correct-glow 1.2s ease;
+    box-shadow: 0 0 24px 6px #6ee76e, 0 2px 12px rgba(0,0,0,0.15);
+    border-color: #6ee76e;
+}
+
+@keyframes correct-glow {
+    0% { box-shadow: 0 0 0 0 #6ee76e; border-color: #fff; }
+    40% { box-shadow: 0 0 24px 6px #6ee76e; border-color: #6ee76e; }
+    100% { box-shadow: 0 0 0 0 #6ee76e; border-color: #fff; }
+}
+</style>
+
+<script>
+function auswerten() {
+    let punkte = 0;
+    document.querySelectorAll('.correct-effect').forEach(img => img.classList.remove('correct-effect'));
+    for (let i = 1; i <= 5; i++) {
+        const checked = document.querySelector(`input[name='q${i}']:checked`);
+        const frageDiv = document.querySelectorAll('.question')[i-1];
+        const img = frageDiv.querySelector('img');
+        if (checked && checked.value === "richtig") {
+            punkte++;
+            if (img) {
+                img.classList.add('correct-effect');
+                setTimeout(() => img.classList.remove('correct-effect'), 1300);
+            }
+        }
+    }
+    const resultDiv = document.getElementById("result");
+    resultDiv.style.display = "block";
+    let feedback = '';
+    if (punkte === 5) feedback = 'Super! Du hast alles richtig! 😺';
+    else if (punkte >= 3) feedback = 'Sehr gut! Du hast viel gesehen!';
+    else if (punkte >= 1) feedback = 'Nicht schlecht! Schau dir die Fotos nochmal an.';
+    else feedback = 'Versuch es nochmal!';
+    resultDiv.textContent = `Du hast ${punkte} von 5 Punkten erreicht! ${feedback}`;
+}
+</script>
+
+</body>
+</html>
