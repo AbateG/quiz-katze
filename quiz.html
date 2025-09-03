@@ -59,12 +59,28 @@
             border-radius: 5px;
             text-align: center;
         }
+        .controls {
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-top:10px;
+            justify-content:center;
+        }
+        .secondary-btn {
+            background:#888;
+        }
+        .secondary-btn:hover { background:#555; }
+        .correct-label { background:#c8f7c5; border-radius:4px; padding:2px 4px; }
+        .incorrect-label { background:#ffd2d2; border-radius:4px; padding:2px 4px; }
+        #progress { text-align:center; margin:10px 0 6px; font-size:0.95rem; color:#555; }
     </style>
 </head>
 <body>
 
 
 <h1>🐾 Katzen-Quiz: Beobachte die Fotos! 🐾</h1>
+
+<div id="progress" aria-live="polite">0 von 5 Fragen beantwortet</div>
 
 <form id="quizForm">
     <div class="question">
@@ -107,7 +123,10 @@
         <label><input type="radio" name="q5" value="falsch"> Sie läuft.</label>
     </div>
 
-    <button type="button" onclick="auswerten()">Quiz auswerten</button>
+    <div class="controls">
+        <button type="button" id="auswertenBtn" onclick="auswerten()">Quiz auswerten</button>
+        <button type="button" id="resetBtn" class="secondary-btn" onclick="resetQuiz()" style="display:none;">Nochmal spielen</button>
+    </div>
 </form>
 
 <div id="result" class="result" style="display:none;"></div>
@@ -146,6 +165,8 @@
 function auswerten() {
     let punkte = 0;
     document.querySelectorAll('.correct-effect').forEach(img => img.classList.remove('correct-effect'));
+    // Entferne alte Markierungen
+    document.querySelectorAll('label').forEach(l => { l.classList.remove('correct-label','incorrect-label'); });
     for (let i = 1; i <= 5; i++) {
         const checked = document.querySelector(`input[name='q${i}']:checked`);
         const frageDiv = document.querySelectorAll('.question')[i-1];
@@ -156,6 +177,16 @@ function auswerten() {
                 img.classList.add('correct-effect');
                 setTimeout(() => img.classList.remove('correct-effect'), 1300);
             }
+            checked.parentElement.classList.add('correct-label');
+        } else if (checked) {
+            checked.parentElement.classList.add('incorrect-label');
+            // Markiere die richtige Antwort zusätzlich
+            const richtige = frageDiv.querySelector("input[value='richtig']");
+            if (richtige) richtige.parentElement.classList.add('correct-label');
+        } else {
+            // Nicht beantwortet -> nur richtige anzeigen
+            const richtige = frageDiv.querySelector("input[value='richtig']");
+            if (richtige) richtige.parentElement.classList.add('correct-label');
         }
     }
     const resultDiv = document.getElementById("result");
@@ -166,7 +197,34 @@ function auswerten() {
     else if (punkte >= 1) feedback = 'Nicht schlecht! Schau dir die Fotos nochmal an.';
     else feedback = 'Versuch es nochmal!';
     resultDiv.textContent = `Du hast ${punkte} von 5 Punkten erreicht! ${feedback}`;
+    // Buttons & Disable
+    document.querySelectorAll('input[type=radio]').forEach(r => r.disabled = true);
+    document.getElementById('auswertenBtn').style.display='none';
+    document.getElementById('resetBtn').style.display='inline-block';
 }
+
+function resetQuiz() {
+    document.getElementById('quizForm').reset();
+    document.getElementById('result').style.display='none';
+    document.querySelectorAll('label').forEach(l => l.classList.remove('correct-label','incorrect-label'));
+    document.querySelectorAll('input[type=radio]').forEach(r => r.disabled = false);
+    document.getElementById('auswertenBtn').style.display='inline-block';
+    document.getElementById('resetBtn').style.display='none';
+    updateProgress();
+}
+
+function updateProgress() {
+    const total = 5;
+    const answered = new Set();
+    for (let i=1;i<=total;i++) {
+        if (document.querySelector(`input[name='q${i}']:checked`)) answered.add(i);
+    }
+    const p = document.getElementById('progress');
+    if (p) p.textContent = `${answered.size} von ${total} Fragen beantwortet`;
+}
+
+document.querySelectorAll("input[type=radio]").forEach(r => r.addEventListener('change', updateProgress));
+updateProgress();
 </script>
 
 </body>
